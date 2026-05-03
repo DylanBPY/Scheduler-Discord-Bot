@@ -5,8 +5,6 @@ import setPingResponseMsg from './commands/util/setPingResponseMsg.js';
 
 dotenv.config();
 const token = config.DISCORD_TOKEN;
-//const commandFiles = path.join(__dirname, 'commands', 'util');
-
 const comm = new Collection();
 const client = new Client({
     intents: [
@@ -16,32 +14,25 @@ const client = new Client({
     ],
 });
 
-
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user?.tag}!`);
 
     const rest = new REST({ version: '10' }).setToken(token);
     try {
-        console.log('Started refreshing application (/) commands.');
-
+        // Add slash commands to this list
         const commands = [
-            setPingResponseMsg.data.toJSON(),
+            setPingResponseMsg.data,
         ];
 
         if (client.user) {
-            await rest.put(
-                Routes.applicationCommands(client.user.id),
-                { body: commands }
-            );
+            await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
         }
-
-        console.log('Successfully reloaded application (/) commands.');
     } catch (error) {
         console.error(error);
     }
 });
 
-// Basic ping-pong message response
+// Ping pong command
 client.on('messageCreate', (message) => {
     if (message.content === '!ping') {
         message.reply('Pong!');
