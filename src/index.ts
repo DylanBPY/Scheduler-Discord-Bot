@@ -2,6 +2,7 @@ import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js'
 import dotenv from 'dotenv';
 import config from '../config.json' with { type: 'json' };
 import setPingResponseMsg from './commands/util/setPingResponseMsg.js';
+import { schedule } from './UserInfo.js';
 
 dotenv.config();
 const token = config.DISCORD_TOKEN;
@@ -14,7 +15,7 @@ const client = new Client({
     ],
 });
 
-client.once('ready', async () => {
+client.once('clientReady', async () => {
     console.log(`Logged in as ${client.user?.tag}!`);
 
     const rest = new REST({ version: '10' }).setToken(token);
@@ -46,5 +47,18 @@ client.on('interactionCreate', async (interaction) => {
         await setPingResponseMsg.execute(interaction);
     }
 });
+
+client.on('messageCreate', (message) => {
+    if (message.mentions.users.size > 0 && !message.author.bot) {
+        const mentionedUserId = message.mentions.users.first()?.id;
+        if (mentionedUserId) {
+            schedule.forEach(([userId, response]) => {
+                if (userId === mentionedUserId) {
+                    message.reply(response!);
+                }
+            });
+        }
+    }
+})
 
 client.login(token);
