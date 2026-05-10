@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, userMention, ChatInputCommandInteraction } from 'discord.js';
+import { schedule } from '../../UserInfo.js';
 
 let user: string | null = null;
 
@@ -13,10 +14,13 @@ const setPingResponseMsg = {
         ).toJSON(),
     async execute(interaction: ChatInputCommandInteraction) {
         user = interaction.user.id;
+
+        schedule.push([user, interaction.options.getString('message', true)]);
+
         await interaction.reply(
             userMention(user) +
-                ' Your ping response message has been set to: ' +
-                interaction.options.getString('message', true)
+            ' Your ping response message has been set to: ' +
+            interaction.options.getString('message', true)
         );
     },
 };

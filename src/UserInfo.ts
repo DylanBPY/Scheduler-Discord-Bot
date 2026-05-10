@@ -1,2 +1,3 @@
-var userPingResponse = {
-}
+let schedule: string[][] = [];
+
+export { schedule };
